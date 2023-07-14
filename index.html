@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<html>
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análise de Estadias</title>
+  <style>
+
+    .TodoCorpo {
+      border-radius: 10px;
+      flex-wrap: wrap;
+      display:flex;
+      flex-direction: column;
+      width: 500px;
+      align-items: center;
+      margin: auto;
+      background-color: rgb(102, 158, 165);
+      margin-top: 40px;
+      box-shadow: 10px 10px;
+    }
+   
+    body {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      background-color: rgb(15, 88, 223);
+
+    }
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    #resultadoDiasUteis {
+      margin-top: 10px;
+      font-weight: bold;
+      color: rgb(231, 9, 9);
+    }
+
+    #resultadoDiarias {
+      margin-top: 10px;
+      font-weight: bold;
+      color: rgb(231, 9, 9);
+    }
+
+    #resultadoValorTotal {
+      margin-top: 10px;
+      font-weight: bold;
+      color: rgb(231, 9, 9);
+    }
+    
+    .entradas{
+      font-weight: bold;
+    }
+    input{
+      border-radius: 10px;
+    }
+
+    .botao{
+      border-radius: 10px;
+      background-color: rgb(91, 119, 119);
+      font-weight: bold;
+    }
+   
+    #resultadoDiasUteis{
+      font-size: 18px;
+      font-weight: bold;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    #resultadoDiasUteis{
+      font-size: 18px;
+      font-weight: bold;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    #resultadoValorTotal{
+      font-size: 18px;
+      font-weight: bold;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="TodoCorpo">
+  <h1>Análise de Estadias</h1>
+
+  <table>
+    <tr>
+      <th>Data do Sinistro</th>
+      <th>Data da Vistoria</th>
+      <th>Acionamento do Prestador</th>
+    </tr>
+    <tr>
+      <td><input type="date" id="dataSinistro"></td>
+      <td><input  type="date" id="dataVistoria" onchange="calcularDiferenca()"></td>
+      <td><input  type="date" id="dataPrestador" onchange="calcularDiferenca()"></td>
+    </tr>
+  </table>
+
+  <div id="resultadoDiasUteis"></div>
+
+  <h2>Total de Diárias</h2>
+  <label class="entradas" for="dataInicio">Data de Início:</label>
+  <input type="date" id="dataInicio">
+  <label class="entradas"  for="dataFim">Data de Fim:</label>
+  <input  type="date" id="dataFim">
+  <button class="botao" onclick="calcularDiarias()">Calcular</button>
+  <div id="resultadoDiarias"></div>
+
+  <h2>Valor total da  Diária</h2>
+  <label class="entradas" for="totalDias">Total de Dias:</label>
+  <input type="number" id="totalDias">
+  <label class="entradas"for="valorDiaria">Valor da Diária:</label>
+  <input type="number" id="valorDiaria">
+  <button class="botao"  onclick="calcularValorTotal()">Calcular</button>
+  <div id="resultadoValorTotal"></div>
+
+</div>
+
+  <script>
+    function calcularDiferenca() {
+      var dataVistoria = new Date(document.getElementById("dataVistoria").value);
+      var dataPrestador = new Date(document.getElementById("dataPrestador").value);
+      var diferencaDias = calcularDiasUteis(dataVistoria, dataPrestador);
+
+      if (diferencaDias <= 2) {
+        document.getElementById("resultadoDiasUteis").innerText = "Gastos de Salvados";
+      } else {
+        document.getElementById("resultadoDiasUteis").innerText = "Gastos de Tramitação";
+      }
+    }
+
+    function calcularDiasUteis(dataInicial, dataFinal) {
+      var quantidadeDias = -1; // Inicia com -1 para excluir o dia inicial (data de vistoria)
+      var diaAtual = new Date(dataInicial.getTime());
+      diaAtual.setDate(diaAtual.getDate() + 1); // Avança para o próximo dia
+
+      while (diaAtual <= dataFinal) {
+        var diaSemana = diaAtual.getDay();
+
+        if (diaSemana !== 0 && diaSemana !== 6) {
+          quantidadeDias++;
+        }
+
+        diaAtual.setDate(diaAtual.getDate() + 1);
+      }
+
+      return quantidadeDias;
+    }
+
+    function calcularDiarias() {
+      var dataInicio = new Date(document.getElementById("dataInicio").value);
+      var dataFim = new Date(document.getElementById("dataFim").value);
+      var quantidadeDiarias = calcularQuantidadeDiarias(dataInicio, dataFim);
+
+      document.getElementById("resultadoDiarias").innerText = "Quantidade de Diárias: " + quantidadeDiarias;
+    }
+
+    function calcularQuantidadeDiarias(dataInicio, dataFim) {
+      var umDiaEmMilissegundos = 24 * 60 * 60 * 1000;
+      var diferencaMilissegundos = Math.abs(dataFim - dataInicio);
+      var quantidadeDiarias = Math.ceil(diferencaMilissegundos / umDiaEmMilissegundos) + 1;
+
+      return quantidadeDiarias;
+    }
+
+    function calcularValorTotal() {
+      var totalDias = parseInt(document.getElementById("totalDias").value);
+      var valorDiaria = parseFloat(document.getElementById("valorDiaria").value);
+      var valorTotal = totalDias * valorDiaria;
+
+      document.getElementById("resultadoValorTotal").innerText = "Valor Total: " + valorTotal.toFixed(2);
+    }
+  </script>
+</body>
+</html>
